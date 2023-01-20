@@ -7,6 +7,8 @@
 #include <cstring>
 #include <string>
 
+setlocale(LC_ALL, "Rus");
+
 /// Префикс и постфикс блока с частотами в закодированном файле
 #define HUFF_PREFIX "<huff>\n"
 #define HUFF_POSTFIX "</huff>\n"
