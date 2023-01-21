@@ -24,15 +24,10 @@ struct Node
 	Node* right;
 };
 
-/**
- * @brief Удалить дерево Хаффмана
- * @param root корень дерева
- */
+
 void deleteTree(Node* root)
 {
-	/**
-	 * @brief Вставляем в очередь левый и правый элемент верхнего в очереди и очищаем верхний пока очередь не пуста
-	 */
+	
 	std::queue<Node*> rq;
 	rq.push(root);
 
@@ -54,11 +49,7 @@ void deleteTree(Node* root)
 	}
 }
 
-/**
- * @brief Вставка с сортировкой вставкой
- * @param node Вектор нод Хаффмана
- * @param newNode Нода для вставки
- */
+
 void lessPush(std::vector<Node*>& node, Node* newNode)
 {
 	auto it = node.begin();
@@ -68,16 +59,10 @@ void lessPush(std::vector<Node*>& node, Node* newNode)
 	node.insert(it, newNode);
 }
 
-/**
- * @brief Создать дерево Хаффмана
- * @param freq Частоты байт входных данных
- * @return Корень дерева хаффмана
- */
+
 Node* getHuffmanTree(const std::array<std::size_t, UCHAR_MAX>& freq)
 {
-	/**
-	 * @brief Создаем вектор нод Хаффмана из массива частот
-	 */
+	
 	std::vector<Node*> pq;
 	for (std::size_t i = 0; i < UCHAR_MAX; ++i)
 	{
@@ -86,19 +71,14 @@ Node* getHuffmanTree(const std::array<std::size_t, UCHAR_MAX>& freq)
 			lessPush(pq, new Node{ static_cast<char>(i), f, nullptr, nullptr });
 	}
 
-	/**
-	 * @brief Для корректной работы если в очереди только один элемент - пусть он будет правым у нового корня
-	 */
+	
 	if (pq.size() == 1)
 	{
 		auto node = pq.back();
 		return new Node{ '\0', node->frequency, node, nullptr };
 	}
 
-	/**
-	 * @brief Пока очередь не пуста берем 2 верхних элемента(с меньшей частотой)
-	 * И добавляем новый элемент где частота - сумма 2 взятых, левый - первый взятый, правый - второй взятый
-	 */
+	
 	while (pq.size() > 1)
 	{
 		auto left = pq.back();
@@ -174,7 +154,60 @@ std::string encode(const std::string& data)
 
 	return encoded;
 }
+std::string decode(const std::string& data)
+{
+	if (data.size() < HUFF_PREFIX_SIZE + HUFF_POSTFIX_SIZE ||
+		std::memcmp(data.data(), HUFF_PREFIX, HUFF_PREFIX_SIZE) != 0)
+	{
+		throw std::runtime_error("Not encoded file");
+	}
 
+	std::array<std::size_t, UCHAR_MAX> freq{};
+	bool closed = false;
+	std::size_t i = HUFF_PREFIX_SIZE;
+	while (i + HUFF_POSTFIX_SIZE <= data.size())
+	{
+		if (std::memcmp(data.data() + i, HUFF_POSTFIX, HUFF_POSTFIX_SIZE) == 0)
+		{
+			i += HUFF_POSTFIX_SIZE;
+			closed = true;
+			break;
+		}
+
+		const unsigned char uc = data[i];
+		i += 2;
+
+		char* e;
+		const auto n = std::strtoull(data.data() + i, &e, 10);
+
+		freq[uc] = n;
+		i = e - data.data() + 1;
+	}
+
+	if (!closed)
+		throw std::runtime_error("Expected close tag.");
+
+	auto root = getHuffmanTree(freq);
+
+	std::string decoded;
+	while (i < data.size())
+	{
+		for (auto node = root; i <= data.size(); ++i)
+		{
+			auto toProcess = data[i] == '0' ? node->left : node->right;
+			if (!toProcess)
+			{
+				decoded += node->c;
+				break;
+			}
+			node = toProcess;
+		}
+	}
+
+	deleteTree(root);
+
+	return decoded;
+}
 
 
 
