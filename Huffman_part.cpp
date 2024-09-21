@@ -179,6 +179,100 @@ std::string decode(const std::string& data)
 	}
 	return decoded;
 }
+int main()
+{
+	std::cout << "Select mode: encode | decode | cmp\n";
+
+	std::string command;
+	std::cin >> command;
+
+	if (command == "encode" || command == "-e")
+	{
+		std::string filename;
+		std::cout << "Filename:";
+		std::cin >> filename;
+
+		std::ifstream ifs(filename);
+		if (!ifs.is_open())
+		{
+			std::cerr << "Can not open \"" << filename << "\".";
+			return -1;
+		}
+
+		const auto encoded = encode({ std::istreambuf_iterator<char>(ifs),
+														std::istreambuf_iterator<char>() });
+
+		std::ofstream ofs("encoded.txt");
+		if (!ofs.is_open())
+		{
+			std::cerr << "Unable to create out file.";
+			return -2;
+		}
+
+		ofs << encoded;
+	}
+	else if (command == "decode" || command == "-d")
+	{
+		std::string filename;
+		std::cout << "Filename:";
+		std::cin >> filename;
+
+		std::ifstream ifs(filename);
+		if (!ifs.is_open())
+		{
+			std::cerr << "Can not open \"" << filename << "\".";
+			return -1;
+		}
+
+		const auto decoded = decode({ std::istreambuf_iterator<char>(ifs),
+														std::istreambuf_iterator<char>() });
+
+		std::ofstream ofs("decoded.txt");
+		if (!ofs.is_open())
+		{
+			std::cerr << "Unable to create out file.";
+			return -2;
+		}
+
+		ofs << decoded;
+	}
+	else if (command == "cmp" || command == "-c")
+	{
+		std::string filename1;
+		std::cout << "Filename 1:";
+		std::cin >> filename1;
+
+		std::string filename2;
+		std::cout << "Filename 2:";
+		std::cin >> filename2;
+
+		std::ifstream ifs1(filename1);
+		if (!ifs1.is_open())
+		{
+			std::cerr << "Can not open \"" << filename1 << "\".";
+			return -1;
+		}
+
+		std::ifstream ifs2(filename2);
+		if (!ifs2.is_open())
+		{
+			std::cerr << "Can not open \"" << filename2 << "\".";
+			return -1;
+		}
+
+		const auto isEq = std::equal(std::istreambuf_iterator<char>(ifs1.rdbuf()),
+			std::istreambuf_iterator<char>(),
+			std::istreambuf_iterator<char>(ifs2.rdbuf()));
+
+		std::cout << "Files are " << (isEq ? "" : "not ") << "equal.";
+	}
+	else
+	{
+		std::cerr << "Invalid command.";
+	}
+
+	return 0;
+}
 
 
 
