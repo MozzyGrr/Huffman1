@@ -7,8 +7,6 @@
 #include <cstring>
 #include <string>
 
-setlocale(LC_ALL, "Rus");
-
 
 #define HUFF_PREFIX "<huff>\n"
 #define HUFF_POSTFIX "</huff>\n"
@@ -200,7 +198,7 @@ int main()
 		}
 
 		const auto encoded = encode({ std::istreambuf_iterator<char>(ifs),
-														std::istreambuf_iterator<char>() });
+		std::istreambuf_iterator<char>() });
 
 		std::ofstream ofs("encoded.txt");
 		if (!ofs.is_open())
@@ -225,7 +223,7 @@ int main()
 		}
 
 		const auto decoded = decode({ std::istreambuf_iterator<char>(ifs),
-														std::istreambuf_iterator<char>() });
+		std::istreambuf_iterator<char>() });	
 
 		std::ofstream ofs("decoded.txt");
 		if (!ofs.is_open())
