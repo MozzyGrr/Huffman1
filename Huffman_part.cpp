@@ -9,13 +9,13 @@
 
 setlocale(LC_ALL, "Rus");
 
-/// Префикс и постфикс блока с частотами в закодированном файле
+
 #define HUFF_PREFIX "<huff>\n"
 #define HUFF_POSTFIX "</huff>\n"
 #define HUFF_PREFIX_SIZE strlen(HUFF_PREFIX)
 #define HUFF_POSTFIX_SIZE strlen(HUFF_POSTFIX)
 
-/// Нода для дерева Хаффмана
+
 struct Node
 {
 	char c;
@@ -23,32 +23,6 @@ struct Node
 	Node* left;
 	Node* right;
 };
-
-
-void deleteTree(Node* root)
-{
-	
-	std::queue<Node*> rq;
-	rq.push(root);
-
-	while (!rq.empty())
-	{
-		auto tmp = rq.front();
-		rq.pop();
-
-		if (tmp)
-		{
-			if (tmp->left)
-				rq.push(tmp->left);
-
-			if (tmp->right)
-				rq.push(tmp->right);
-		}
-
-		delete tmp;
-	}
-}
-
 
 void lessPush(std::vector<Node*>& node, Node* newNode)
 {
@@ -147,7 +121,7 @@ std::string encode(const std::string& data)
 
 	const auto huffmanCode = getHuffmanCodes(root);
 
-	deleteTree(root);
+	
 
 	for (const auto& c : data)
 		encoded += huffmanCode.at(c);
@@ -203,9 +177,6 @@ std::string decode(const std::string& data)
 			node = toProcess;
 		}
 	}
-
-	deleteTree(root);
-
 	return decoded;
 }
 
